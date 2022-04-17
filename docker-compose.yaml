@@ -1,0 +1,22 @@
+services:
+  bomberman:
+    container_name: bomberman
+    build:
+      context: ./docker
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/bomberman_ws
+      - /tmp/.X11-unix
+      - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /var/run/dbus:/var/run/dbus:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - ${XDG_RUNTIME_DIR}/pulse/native:${XDG_RUNTIME_DIR}/pulse/native
+      - ~/.config/pulse/cookie:/root/.config/pulse/cookie}}
+    runtime: nvidia
+    environment:
+      - DISPLAY
+      - "QT_X11_NO_MITSHM=1"
+      - "XAUTHORITY=$XAUTH"
+      - "QT_GRAPHICSSYSTEM=native"
+      - "PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native"

@@ -1,0 +1,19 @@
+<launch>
+    <node name="map_server" pkg="map_server" type="map_server" args="/bomberman_ws/bomberman/map/map.yaml"/>
+    <group ns="robot1">
+	<include file="$(find morse_2dnav)/move_base_robot_stack.launch" >
+	<arg name="robot" value="robot1"/>
+	</include>
+    </group>
+    <group ns="robot2">
+	<include file="$(find morse_2dnav)/move_base_robot_stack.launch" >
+	<arg name="robot" value="robot2"/>
+	</include>
+    </group>
+    <group ns="robot3">
+	<include file="$(find morse_2dnav)/move_base_robot_stack.launch" >
+	<arg name="robot" value="robot3"/>
+	</include>
+    </group>
+</launch>
+
