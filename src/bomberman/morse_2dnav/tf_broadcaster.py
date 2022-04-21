@@ -10,14 +10,13 @@ import numpy as np
 import tf_conversions
 import tf2_ros
 import geometry_msgs.msg
-import turtlesim.msg
 
 
 pub = None
 br = tf2_ros.TransformBroadcaster()
 new_msg = Odometry()
 t = geometry_msgs.msg.TransformStamped()
-def handle_turtle_pose(msg, turtlename):
+def handle_pose(msg, name):
     global new_msg
     new_msg.header = msg.header
     new_msg.header.frame_id = "map"
@@ -25,7 +24,7 @@ def handle_turtle_pose(msg, turtlename):
     new_msg.child_frame_id = name+"/base_footprint"
     new_msg.pose.pose = msg.pose
 
-def handle_turtle_odom(msg, turtlename):
+def handle_odom(msg, name):
     global t, br
 
     t.header.stamp = rospy.Time.now()
@@ -40,7 +39,7 @@ def handle_turtle_odom(msg, turtlename):
 if __name__ == '__main__':
     global t, br, new_msg, pub
     try:
-        rospy.init_node('turtle_tf_broadcaster')
+        rospy.init_node('tf_broadcaster')
         name = rospy.get_param('~name')
         t.header.frame_id = name+"/odom"
         t.child_frame_id = name+"/base_footprint"
@@ -49,7 +48,7 @@ if __name__ == '__main__':
         t.transform.translation.y = 0
         t.transform.translation.z = 0
         t.transform.rotation.w = 1
-        rospy.Subscriber('/%s/pose' % name, PoseStamped, handle_turtle_pose, name)
+        rospy.Subscriber('/%s/pose' % name, PoseStamped, handle_pose, name)
         pub = rospy.Publisher('/%s/base_pose_ground_truth' % name, Odometry, queue_size=1)
         rate = rospy.Rate(50)
         while not rospy.is_shutdown():

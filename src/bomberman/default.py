@@ -8,8 +8,8 @@ if __name__ == "__main__":
     robot2 = PioneerRobot(name="robot2")
     robot3 = PioneerRobot(name="robot3")
 
-    robot1.add_to_simulation(position={'x': 7, 'y': -7, 'z': 0.1}, rotation={'x': 0, 'y': 0, 'z': 0})
-    robot2.add_to_simulation(position={'x': 3, 'y': 0, 'z': 0.1}, rotation={'x': 0, 'y': 0, 'z': 0})
+    robot1.add_to_simulation(position={'x': -2, 'y': 1, 'z': 0.1}, rotation={'x': 0, 'y': 0, 'z': 0})
+    robot2.add_to_simulation(position={'x': 3, 'y': -2, 'z': 0.1}, rotation={'x': 0, 'y': 0, 'z': 0})
     robot3.add_to_simulation(position={'x': 3, 'y': 5, 'z': 0.1}, rotation={'x': 0, 'y': 0, 'z': 0})
 
     env = Environment('/bomberman_ws/bomberman/map/map.blend')

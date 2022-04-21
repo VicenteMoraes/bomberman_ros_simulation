@@ -2,24 +2,72 @@ import rospy
 from geometry_msgs.msg import PoseStamped
 from morse.builder import *
 
+bomb_range = 2
+bomb_duration = 5
 
 class PioneerRobot(Pioneer3DX):
     number_of_robots = 3
+    robots = []
 
     def __init__(self, name: str = ""):
         Pioneer3DX.__init__(self, name)
         self.name = name
         self.pose = PoseStamped()
         self.cmd_vel = 0
-        self.my_pose = rospy.Subscriber(f"/{self.name}/pose", PoseStamped, self.set_pose)
+        self.pose_sub = rospy.Subscriber(f"/{self.name}/pose", PoseStamped, self.set_pose)
         self.bomb_pub = rospy.Publisher("bomb", PoseStamped, 1)
-        self.pose_subs = dict()
+
+    def distance_to(self, other):
+        # Euclidean distance
+        a = self.pose
+        try:
+            b = other.pose
+        except AttributeError:
+            b = other
+        return ((a.pose.position.x - b.pose.position.x)**2 + (a.pose.position.y - b.pose.position.y)**2) ** 0.5
+
+    def get_closest_robot(self):
+        closest = (None, float('inf'))
+        for neighbour in self.robots:
+            if self == neighbour:
+                continue
+            distance = self.distance_to(neighbour)
+            if distance  < closest[1]:
+                closest = (neighbour, distance)
+        return closest
 
     def set_pose(self, pose: PoseStamped):
         self.pose = pose
+        closest_robot, distance = self.get_closest_robot()
+        if distance < bomb_range + 1:
+            self.launch_bomb(closest_robot.pose)
 
     def launch_bomb(self, position: PoseStamped):
+        try:
+            import bge
+        except ImportError:
+            # Game engine hasn't started yet
+            return
+
+        scene = bge.logic.getCurrentScene()
+        obj = scene.addObject("/bomberman_ws/bomberman/map/bomb.blender", time=0)
+        rospy.Timer(rospy.Duration(bomb_duration), self.explode, (position, obj))
+
         self.bomb_pub.publish(position)
+
+    def explode(self, bomb_position, blender_obj):
+        try:
+            import bge
+        except ImportError:
+            # Game engine hasn't started yet
+            return
+
+        scene = bge.logic.getCurrentScene()
+        obj.endObject()
+        for robot in self.robots:
+            if robot.distance_to(bomb_position) < bomb_range
+                scene.objects[robot.name].endObject()
+
 
     def add_lidar_sensor(self):
         self.lidar = Hokuyo()
@@ -48,13 +96,6 @@ class PioneerRobot(Pioneer3DX):
         self.append(odometry)
         odometry.add_interface('ros', topic=f"{self.name}/odom", frame_id=f"{self.name}/odom", child_frame_id=f"{self.name}/base_footprint")
 
-    def pose_callback(self, pose: PoseStamped):
-        pass
-
-    def add_pose_subscriber(self, robot_name: str):
-        # Subscribes to another robot's pose topic
-        self.pose_subs[robot_name] = rospy.Subscriber(f"{robot_name}/pose", PoseStamped, self.pose_callback)
-
     def add_to_simulation(self, position, rotation):
         self.x = position["x"]
         self.y = position["y"]
@@ -65,6 +106,5 @@ class PioneerRobot(Pioneer3DX):
         self.add_motion_actuator()
         self.add_odom_sensor()
         self.add_lidar_sensor()
-
-        for i in range(1, self.number_of_robots+1):
-            self.add_pose_subscriber(f"robot{i}")
+        
+        self.robots.append(self)
