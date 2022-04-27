@@ -16,6 +16,7 @@ class PioneerRobot(Pioneer3DX):
         self.name = name
         self.pose_stamped = PoseStamped()
         self.pose_sub = rospy.Subscriber(f"/{self.name}/pose", PoseStamped, self.set_pose)
+        self.bomb_pub = rospy.Publisher("bomb", PoseStamped, queue_size=10)
         self.bomb_target_sub = rospy.Subscriber(f"/{self.name}/bomb_target", String, self.launch_bomb)
         self.bomb_name = "bomb" if name == "robot1" else f"bomb.00{int(name[-1])-1}"
 
@@ -44,7 +45,7 @@ class PioneerRobot(Pioneer3DX):
         self.explode_target = robot.pose_stamped
         rospy.Timer(rospy.Duration(bomb_duration), self.explode)
 
-        self.bomb_pub.publish(robot.pose_stamped)
+        #self.bomb_pub.publish(robot.pose_stamped)
 
     def explode(self, _):
         try:
@@ -55,7 +56,7 @@ class PioneerRobot(Pioneer3DX):
 
         scene = bge.logic.getCurrentScene()
         scene.objects[self.bomb_name].worldPosition.z = -10
-        for robot in self.robots:
+        for robot in list(self.robots.values()):
             if robot.distance_to(self.explode_target) < bomb_range:
                 scene.objects[robot.name].endObject()
 
