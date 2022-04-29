@@ -1,21 +1,27 @@
 <launch>
     <node name="map_server" pkg="map_server" type="map_server" args="/bomberman_ws/bomberman/map/map.yaml"/>
     <group ns="robot1">
-	<include file="$(find morse_2dnav)/move_base_robot_stack.launch" >
+	<include file="$(find morse_2dnav)/launch/move_base_robot_stack.launch" >
 	<arg name="robot" value="robot1"/>
 	</include>
     </group>
     <group ns="robot2">
-	<include file="$(find morse_2dnav)/move_base_robot_stack.launch" >
+	<include file="$(find morse_2dnav)/launch/move_base_robot_stack.launch" >
 	<arg name="robot" value="robot2"/>
 	</include>
     </group>
     <group ns="robot3">
-	<include file="$(find morse_2dnav)/move_base_robot_stack.launch" >
+	<include file="$(find morse_2dnav)/launch/move_base_robot_stack.launch" >
 	<arg name="robot" value="robot3"/>
 	</include>
     </group>
+    <group ns="robot4">
+	<include file="$(find morse_2dnav)/launch/move_base_robot_stack.launch" >
+	<arg name="robot" value="robot4"/>
+	</include>
+    </group>
     <node pkg="morse_2dnav" type="path_planner.py" respawn="false" name="path_planner" output="screen" />
+    <node pkg="morse_2dnav" type="bomb_planner.py" respawn="false" name="bomb_planner" output="screen" />
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find morse_2dnav)/rviz/bomberman.rviz" />
 </launch>
 
