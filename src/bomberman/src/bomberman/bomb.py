@@ -3,7 +3,7 @@ from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Bool
 from morse.builder import *
 
-bomb_range = 0.75
+bomb_range = 1
 bomb_duration = 20
 
 class Bomb:

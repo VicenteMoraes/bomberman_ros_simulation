@@ -9,8 +9,8 @@ from itertools import combinations
 num_robots = 4
 robots = [f"robot{num}" for num in range(1,num_robots+1)]
 bomb_duration = 20
-bomb_range = 0.75
-thrower_length_advantage = 0.5
+bomb_range = 1
+thrower_length_advantage = 1
 
 class Robot:
     def __init__(self, name):

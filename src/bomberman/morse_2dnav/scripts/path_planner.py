@@ -10,7 +10,7 @@ from itertools import combinations
 num_robots = 4
 robots = [f"robot{num}" for num in range(1,num_robots+1)]
 bomb_duration = 20
-bomb_range = 0.75
+bomb_range = 1
 
 obstacle_length = 1
 obstacle_matrix = [
