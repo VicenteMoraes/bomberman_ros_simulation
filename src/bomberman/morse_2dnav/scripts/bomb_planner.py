@@ -8,9 +8,9 @@ from itertools import combinations
 
 num_robots = 4
 robots = [f"robot{num}" for num in range(1,num_robots+1)]
-bomb_duration = 10
-bomb_range = 2
-thrower_length_advantage = 1.5
+bomb_duration = 20
+bomb_range = 0.75
+thrower_length_advantage = 0.5
 
 class Robot:
     def __init__(self, name):
@@ -53,8 +53,8 @@ class Robot:
 
         self.bomb_available = False
         target.bomb_available = False
-        rospy.Timer(rospy.Duration(bomb_duration), self.reset_bomb)
-        rospy.Timer(rospy.Duration(bomb_duration), target.reset_bomb)
+        rospy.Timer(rospy.Duration(bomb_duration + 2), self.reset_bomb)
+        rospy.Timer(rospy.Duration(bomb_duration + 2), target.reset_bomb)
 
 
 class Planner:

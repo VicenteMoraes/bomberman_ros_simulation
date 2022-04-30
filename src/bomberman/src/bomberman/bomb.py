@@ -3,8 +3,8 @@ from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Bool
 from morse.builder import *
 
-bomb_range = 2
-bomb_duration = 10
+bomb_range = 0.75
+bomb_duration = 20
 
 class Bomb:
     def __init__(self, robot, name):
@@ -23,7 +23,10 @@ class Bomb:
             # Game engine hasn't started yet
             return
 
-        robot = self.robots[target.data]
+        try:
+            robot = self.robots[target.data]
+        except KeyError:
+            return
         scene = bge.logic.getCurrentScene()
         scene.objects[self.name].worldPosition = scene.objects[robot.name].worldPosition
         scene.objects[self.name].worldPosition.z = 0.8
