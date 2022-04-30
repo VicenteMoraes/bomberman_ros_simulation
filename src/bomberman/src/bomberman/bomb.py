@@ -1,5 +1,6 @@
 import rospy
 from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import Bool
 from morse.builder import *
 
 bomb_range = 2
@@ -25,6 +26,7 @@ class Bomb:
         robot = self.robots[target.data]
         scene = bge.logic.getCurrentScene()
         scene.objects[self.name].worldPosition = scene.objects[robot.name].worldPosition
+        scene.objects[self.name].worldPosition.z = 0.8
         self.explode_target = robot.pose_stamped
         rospy.Timer(rospy.Duration(bomb_duration), self.explode)
 
@@ -41,5 +43,21 @@ class Bomb:
         scene.objects[self.name].worldPosition.z = -10
         for robot in list(self.robots.values()):
             if robot.distance_to(self.explode_target) < bomb_range:
-                scene.objects[robot.name].endObject()
+                msg = Bool()
+                msg.data = True
+                del robot.robots[robot.name]
+                robot.kill_pub.publish(msg)
+                try:
+                    scene.objects[robot.name].endObject()
+                except KeyError:
+                    continue
+
+                digit = robot.name[-1]
+                caster_wheel = "CasterWheel" if digit == '1' else f"CasterWheel.00{int(digit)-1}"
+                wheel_l = "Wheel_L" if digit == '1' else f"Wheel_L.00{int(digit)-1}"
+                wheel_r = "Wheel_R" if digit == '1' else f"Wheel_R.00{int(digit)-1}"
+
+                scene.objects[caster_wheel].endObject()
+                scene.objects[wheel_l].endObject()
+                scene.objects[wheel_r].endObject()
 

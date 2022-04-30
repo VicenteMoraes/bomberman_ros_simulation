@@ -2,7 +2,7 @@
 
 import rospy
 from geometry_msgs.msg import PoseStamped
-from std_msgs.msg import Int64, String
+from std_msgs.msg import Int64, String, Bool
 import random
 from itertools import combinations
 
@@ -16,11 +16,16 @@ class Robot:
     def __init__(self, name):
         self.name = name
 
+        self.kill_sub = rospy.Subscriber(f"/{name}/kill", Bool, self.kill)
         self.pose_sub = rospy.Subscriber(f"/{name}/pose", PoseStamped, self.set_pose)
         self.stop_pub = rospy.Publisher(f"/{name}/stop", Int64, queue_size=1)
         self.target_pub = rospy.Publisher(f"/{name}/bomb_target", String, queue_size=1)
         self.pose_stamped = PoseStamped()
         self.bomb_available = True
+        self.is_killed = False
+
+    def kill(self, _):
+        self.is_killed = True
 
     def reset_bomb(self, _):
         self.bomb_available = True
@@ -47,7 +52,9 @@ class Robot:
         self.stop_pub.publish(stop_duration)
 
         self.bomb_available = False
+        target.bomb_available = False
         rospy.Timer(rospy.Duration(bomb_duration), self.reset_bomb)
+        rospy.Timer(rospy.Duration(bomb_duration), target.reset_bomb)
 
 
 class Planner:
@@ -66,6 +73,9 @@ class Planner:
     def run(self):
         while not rospy.is_shutdown():
             self.bomb_calculation()
+            for robot in self.robots:
+                if robot.is_killed:
+                    self.robots.remove(robot)
             self.rate.sleep()
 
 

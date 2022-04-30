@@ -1,6 +1,6 @@
 import rospy
 from geometry_msgs.msg import PoseStamped
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 from morse.builder import *
 from bomberman.bomb import Bomb
 import random
@@ -13,6 +13,7 @@ class PioneerRobot(Pioneer3DX):
         self.name = name
         self.pose_stamped = PoseStamped()
         self.pose_sub = rospy.Subscriber(f"/{self.name}/pose", PoseStamped, self.set_pose)
+        self.kill_pub = rospy.Publisher(f"/{self.name}/kill", Bool, queue_size=1)
         self.bomb_target_sub = rospy.Subscriber(f"/{self.name}/bomb_target", String, self.launch_bomb)
 
     def set_pose(self, pose: PoseStamped):
