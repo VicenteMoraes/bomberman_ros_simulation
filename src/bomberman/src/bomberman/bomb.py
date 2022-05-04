@@ -4,7 +4,7 @@ from std_msgs.msg import Bool
 from morse.builder import *
 
 bomb_range = 1
-bomb_duration = 20
+bomb_duration = 10
 
 class Bomb:
     def __init__(self, robot, name):
@@ -31,7 +31,7 @@ class Bomb:
         scene.objects[self.name].worldPosition = scene.objects[robot.name].worldPosition
         scene.objects[self.name].worldPosition.z = 0.8
         self.explode_target = robot.pose_stamped
-        rospy.Timer(rospy.Duration(bomb_duration), self.explode)
+        rospy.Timer(rospy.Duration(bomb_duration), self.explode, oneshot=True)
 
         self.bomb_pub.publish(robot.pose_stamped)
 

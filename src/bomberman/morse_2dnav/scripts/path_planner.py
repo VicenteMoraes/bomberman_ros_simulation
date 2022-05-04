@@ -9,7 +9,7 @@ from itertools import combinations
 
 num_robots = 4
 robots = [f"robot{num}" for num in range(1,num_robots+1)]
-bomb_duration = 20
+bomb_duration = 10
 bomb_range = 1
 
 obstacle_length = 1
@@ -58,7 +58,7 @@ class Robot:
         duration = msg.data
         self.stop()
         self.blocked = True
-        rospy.Timer(rospy.Duration(duration), self.reset_movement)
+        rospy.Timer(rospy.Duration(duration), self.reset_movement, oneshot=True)
 
     def stop(self):
         self.movebase_client.cancel_goals_at_and_before_time(rospy.Time.now())
@@ -81,18 +81,17 @@ class Robot:
         return target
 
     def escape(self, bomb_pose):
-        if not self.blocked and self.distance_to(bomb_pose) <= bomb_range:
+        if self.distance_to(bomb_pose) <= bomb_range:
             self.blocked = True
             new_target = self.get_escape_target()
-            #new_target.pose.position.y += min(self.pose_stamped.pose.position.y + 3, 6)
             self.set_target(new_target)
-            rospy.Timer(rospy.Duration(bomb_duration), self.reset_movement)
+            rospy.Timer(rospy.Duration(bomb_duration), self.reset_movement, oneshot=True)
 
 
 class Planner:
     def __init__(self):
         self.robots = [Robot(robot) for robot in robots]
-        self.rate = rospy.Rate(0.1)
+        self.rate = rospy.Rate(0.2)
 
     def get_closest_robot(self, robot):
         closest = (None, float('inf'))
