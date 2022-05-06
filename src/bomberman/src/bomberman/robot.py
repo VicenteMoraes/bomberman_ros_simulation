@@ -15,9 +15,22 @@ class PioneerRobot(Pioneer3DX):
         self.pose_sub = rospy.Subscriber(f"/{self.name}/pose", PoseStamped, self.set_pose)
         self.kill_pub = rospy.Publisher(f"/{self.name}/kill", Bool, queue_size=1)
         self.bomb_target_sub = rospy.Subscriber(f"/{self.name}/bomb_target", String, self.launch_bomb)
+        self.startup = False
 
     def set_pose(self, pose: PoseStamped):
         self.pose_stamped = pose
+        if not self.startup:
+            try:
+                import bge
+            except ImportError:
+                return
+
+            scene = bge.logic.getCurrentScene()
+            obj = scene.objects[f"cube{self.name[-1]}"]
+            robot = scene.objects[self.name]
+            obj.worldPosition = [robot.worldPosition[0], robot.worldPosition[1], robot.worldPosition[2] + 0.1]
+            obj.setParent(robot, False, True)
+            self.startup = True
 
     def distance_to(self, other):
         # Euclidean distance
@@ -70,5 +83,7 @@ class PioneerRobot(Pioneer3DX):
         self.add_lidar_sensor()
 
         self.bomb = Bomb(robot=self, name=f"bomb{self.name[-1]}")
+        self.cube = PassiveObject('/bomberman_ws/bomberman/map/block.blend', f"cube{self.name[-1]}")
+        self.cube.translate(x=int(self.name[-1]), y=0, z=-5)
 
         self.robots[self.name] = self

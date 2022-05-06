@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     robot1.add_to_simulation(position={'x': -3, 'y': -3, 'z': 0.1}, rotation={'x': 0, 'y': 0, 'z': 2})
     robot2.add_to_simulation(position={'x': 3, 'y': -2, 'z': 0.1}, rotation={'x': 0, 'y': 0, 'z': 0})
-    robot3.add_to_simulation(position={'x': 2, 'y': 4, 'z': 0.1}, rotation={'x': 0, 'y': 0, 'z': 0})
+    robot3.add_to_simulation(position={'x': 2, 'y': 4, 'z': 0.1}, rotation={'x': 0, 'y': 0, 'z': 2})
     robot4.add_to_simulation(position={'x': 6, 'y': -7, 'z': 0.1}, rotation={'x': 0, 'y': 0, 'z': 0})
 
     env = Environment('/bomberman_ws/bomberman/map/map.blend')
